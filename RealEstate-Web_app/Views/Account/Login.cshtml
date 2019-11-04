@@ -1,0 +1,300 @@
+﻿
+@{
+    ViewData["Title"] = "Your Account";
+}
+<!DOCTYPE html>
+@model Account
+
+
+
+@section scripts{
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+
+    <script>
+        function CopyPublicKey() {
+            var copyText = document.getElementById("Public-Key");   /* Get the text field */
+            copyText.select();                                    /* Select the text field */
+            copyText.setSelectionRange(0, 99999);                 /*For mobile devices*/
+            document.execCommand("copy");                           /* Copy the text inside the text field */
+            //alert("Copied the text: " + copyText.value);           /* Alert the copied text */
+            new duDialog('Public Key Copied', copyText.value);
+
+
+        }
+        
+        function CopyPrivateKey() {              
+            var tmp = document.createElement("textarea");
+            tmp.value = "@Model.AccountPassword";
+            tmp.style.height = "0";
+            tmp.style.overflow = "hidden";
+            tmp.style.position = "fixed";
+            document.body.appendChild(tmp);
+            tmp.focus();
+            tmp.select();
+            document.execCommand("copy");
+            document.body.removeChild(tmp);
+
+             new duDialog('Private Key Copied', "[Content is restricted]");
+
+            
+        }
+        
+        
+
+        function ETH_To_ILS() {
+            var labelILS1 = document.getElementById("ILS-Value1");   /* Get the text field */
+            var labelILS2 = document.getElementById("ILS-Value2");   /* Get the text field */
+            
+            var cal, cal2;
+            cal1 = 638.2;
+            cal1 = @Model.getExchangeRate_ETH_To_ILS(); 
+            
+            if (cal1 == -1) {
+                console.log("ILS BALANCE ERROR===>\nThe RSS template of the exchange-rates website has been changed.\nPlease fix getExchangeRate_ETH_To_ILS function in the Server(C#)"); 
+                labelILS.innerHTML = "₪ ".fontsize(5) + "ERROR";
+                return;
+            }
+                
+            cal2 = parseFloat( $("#ETH-Value").text() );
+            cal1 = cal1 * cal2;
+            if (cal1 == 0)
+                cal1 = cal1.toFixed(1);
+            else
+                cal1 = cal1.toFixed(3);
+
+            labelILS1.innerHTML = "₪ ".fontsize(5) + cal1;
+            labelILS2.innerHTML = "₪ ".fontsize(5) + cal1;
+        }
+
+        function SetOx() {
+            if ($('#RecipientAddressInput').val() == "")
+            {
+                 $("#RecipientAddressInput").val("0x"); 
+            }
+                    
+        }
+
+        /*$("#RecipientBalance").inputFilter(
+         * function(value) 
+         * {
+                        return /^-?\d*[.,]?\d*$/.test(value); 
+           });
+*/
+         /*(function($) {
+            $.fn.inputFilter = function(inputFilter) {
+                return this.on("input keydown keyup mousedown mouseup select contextmenu drop", function() {
+                if (inputFilter(this.value)) {
+                    this.oldValue = this.value;
+                    this.oldSelectionStart = this.selectionStart;
+                    this.oldSelectionEnd = this.selectionEnd;
+                }
+                else if (this.hasOwnProperty("oldValue"))
+                {
+                    this.value = this.oldValue;
+                    this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+                }
+                 });
+                };
+            }(jQuery));*/
+
+        function prepareSendMoneyTransaction()
+        {
+             
+            if ($("#sendMoneyForm").is(":hidden"))
+            {
+                $('#sendMoneyForm').show();
+                 //border-style: dashed
+                $('#RecipientAddressInput').val("");
+                $('#RecipientAmmountInput').val("");
+                document.getElementById("sendMoneyDiv").style.border = " dashed "; 
+            }
+            else   
+            {
+                 $("#sendMoneyForm").hide();
+                 document.getElementById("sendMoneyDiv").style.border = "none"; 
+
+            }
+
+            //$('#sendMoneyForm').style.display = "block";
+            
+            //$('#RecipientAddressInput').show();
+            //$('#sendMoneyForm').hide();
+            
+            
+        }
+        
+    </script>
+}
+
+
+
+<html lang="en">
+<head>
+    <link href="~/css/ApplicationDesign.css" rel="stylesheet" asp-append-version="true" />
+    <link href="~/css/bootstrap.min.css" rel="stylesheet" />
+    <script type="text/javascript" src="~/js/site.js"></script>
+    <link href="~/css/duDialog.css" rel="stylesheet">
+    <script src="/js/duDialog.js"></script>
+
+    <meta charset="utf-8" />
+</head>
+
+<body onload="ETH_To_ILS();">
+    <div class="container">
+
+        <div id="leftWindow" style="" class="">
+            <center>
+
+
+                <img src="/img/myloogoNoBack.png" style="height:90px; width:480px; position:relative; top:25px; left:-2px; " />
+                <br /><br /><br /><br />
+                <button type="button" class="btn btn-danger disabled" style=" width:28% ; height:4% ; font-size:12px ; padding-left:2px ; padding-right:2px"><img src="/img/pkey.png" style="height:18px; width:18px; position:relative; top:-1px; left: -8px; margin:0 auto " /><span style="position:relative; left:-2px" onclick="CopyPrivateKey()">Your Private-Key</span></button>
+                <button type="button" class="btn btn-outline-info" style=" width:28% ; height:4% ; font-size:12px ; padding-left:2px ; padding-right:2px" onclick="location.href='@Url.Action("LogOut", "Account")'"><img src="/img/logout.png" style="height:18px; width:18px; position:relative; top:-2px; margin:0 auto " />Logout</button>
+                <br />
+                <hr class="my-4">
+                <div class="form-group" style="padding-right:25px">
+
+                    <center>
+                        <label for="user1" style="font-size:12px">Address:</label>
+                        <div id="public-Key-input">
+                            <input type="text" class="form-control" id="Public-Key" value=@Model.AccountAddress style=" background-color:#DCDCDC; width: 300px;height:30px; text-align:center;padding-right:0px; padding-left:0px; font-size:12px" readonly>
+                            <button title="Copy Public Key" type="button" class="btn btn-primary" style=" font-size:12px; position:relative; left: 0.88px;  padding: 0px 0px 0px 0px ;height:30px; width:30px  "><img src="/img/copy.png" style="height:18px; width:18px; position:relative; top:-2px; margin:0 auto " onclick="CopyPublicKey()" /></button>
+                            <div style="display:flex; position:relative; left:10px">
+                                <button title="Add new asset" type="button" class="btn btn-success" style="height:30px; width:30px;padding: 0px 0px 0px 0px ;position:relative; left:10px " onclick="addNewHouse()"><img src="/img/add.png" style="height:15px; width:15px; position:relative; left: 0%; top:-2.2px" /></button>
+                                <button title="Remove asset" type="button" class="btn btn-danger" style="height:30px; width:30px;padding: 0px 0px 0px 0px ;position:relative; left:14.5px " onclick="deleteNewHouse()"><img src="/img/bin.png" style="height:20px; width:15px; position:relative; left: 0%; top:-2.2px" /></button>
+                                <button title="Edit your asset" type="button" class="btn btn-info" style="height:30px; width:30px;padding: 0px 0px 0px 0px ;position:relative; left:19px " onclick="editHouse()"><img src="/img/edit-icon.png" style="height:21px; width:21px; position:relative; left: 2%; top:-1.4px" /></button>
+                            </div>
+                        </div>
+                    </center>
+                </div>
+                <br />
+
+                <div id="balance-zone" style="padding:5%; ">
+                    <div style="position:relative;top:-20% ; display:inline-flex">
+
+                        <img class="balance-icon" src="/img/Ethereum-ETH-icon.png" style=" position:relative; top:10px;margin-right: 15px ; height: 50px; width: 50px; border-radius: 25px; ">
+                        <center>
+                            <div>
+                                <label id="ETH-Value" style="color:white;  font-size:27px"><strong>@Model.AccountBalance ETH</strong></label>
+                                <br>
+                                <label id="ILS-Value1" style="color:white; font-size:17px; position:relative; top:-15px "> </label>
+                            </div>
+                        </center>
+                    </div>
+
+                </div>
+
+                <br /><br />
+                <div style="display:inline-grid; position:relative; top:15px;">
+                    <div style="display:inline-flex; position:relative; left:13px">
+                        <div class="form-group" id="gender" style="position:relative; top:-35px; left:28px">
+                            <label for="exampleSelect2" style="position:relative; left:-55px">Your Assets:</label>
+                            <select multiple="" class="form-control" id="exampleSelect2" style="width:230px; height:100px; position:relative;top:-5px; left:15px">
+                                <option onclick="loadDetails('/img/houses-small//house1.jpg','Yakinton 7/0','Jerusalem')">Yakinton 7/0, Jerusalem</option>
+                                <option onclick="loadDetails('/img/houses-small//house2.jpg','Dan 2/0','Ashdod')">Dan 20/0, Ashdod</option>
+                                <option onclick="loadDetails('/img/houses-small//house3.jpg','Lotem 9/0','Haifa')">Lotem 09/0, Haifa</option>
+                                <option onclick="loadDetails('/img/houses-small//house4.jpg','Nurit 3/0','Yavne')">Nurit 30/0, Yavne</option>
+                                <option onclick="loadDetails('/img/houses-small//house5.jpg','Nili 2/0','Holon')">Nili 02/0, Holon</option>
+                                <option onclick="loadDetails('/img/houses-small//house6.jpg','Lilak 1/0','Karmiel')">Lilak 44/0, Karmiel</option>
+                                <option onclick="loadDetails('/img/houses-small//house7.jpg','Tavor 5/0','Lod')">Tavor 05/0, Lod</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div style="display:inline-flex; position:relative; left: 0px;top: -30px; border: 3px solid; border-color:gray; width: 350px; height:120px; background-color: #FAFAD2; border-style: dotted ">
+                        <img src="img/houses-small//house1.jpg" style="height:100px; width:150px; position:relative; top:08px; left:05px" id="houseImageLeftWindow" />
+                        <div style="display:inline-block; position:relative; left:22px; top:29px;">
+                            <p> <strong><u>Address:</u></strong> <span id="leftWindowAddress">Yakinton 7/0</span></p>
+                            <p><strong><u>Loaction:</u></strong> <span id="leftWindowLoaction">Jerusalem</span></p>
+                        </div>
+                    </div>
+                </div>
+            </center>
+        </div> <!--left window-->
+
+
+
+
+
+        <div style=" float:right; padding-left:30px" id="upperWindow">
+            <br />
+
+            <table>
+                <tr style=" ">
+                    <!--line-->
+                    <td style="padding-right:150px">
+                        <br />
+                        <div style=" display:inline-flex">
+                            <img class="balance-icon" src="/img/Ethereum-ETH-icon.png" style=" position:relative; top:10px;margin-right: 15px ; height: 50px; width: 50px; border-radius: 25px; ">
+                            <center>
+                                <div>
+                                    <label id="ETH-Value" style="color:#4d4d4d;  font-size:27px"><strong>@Model.AccountBalance ETH</strong></label>
+                                    <br>
+                                    <label id="ILS-Value2" style="color:#4d4d4d; font-size:17px; position:relative; top:-15px "> </label>
+                                </div>
+                            </center>
+                        </div>
+                    </td> 
+
+                    <td style=" margin-left:00px ; background-color: #c3c3a2; " id="sendMoneyDiv">
+                        <div id="sendMoneyForm" style="display:none;  " class="">
+                            @using (Html.BeginForm("Login", "Account"))
+                            {
+                                <form class="form-group" method="post" id="sendETH" action="SendEthAction" style="">
+                                    <table>
+                                        <tr style="">
+                                            <!--first line-->
+                                            <td>
+                                                <input style=" width:200px; " name="RecipientAddress" type="text" class="form-control" required="required" id="RecipientAddressInput" placeholder="Enter Recipient Address" onclick="SetOx()">
+                                            </td>
+
+                                        </tr>
+                                        <tr style="">
+                                            <!--second line-->
+                                            <td style="">
+                                                <input name="RecipientBalance" type="number" class="form-control" required="required" id="RecipientAmmountInput" placeholder="Enter Ammount" style=" " min="0" max=@Model.AccountBalance>
+                                            </td>
+                                            <td>
+                                                <a style="color:blue;  " onclick="prepareSendMoneyTransaction()" href="javascript:void(0);"><strong>Cancel</strong></a>
+                                            </td>
+                                            <td style="padding-left:20px">
+                                                <a style="color:blue;  "><strong>Next></strong></a>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </form>
+                            }
+                        </div>
+                    </td>
+
+                    <td style="">
+                        <button type="button" class="btn btn-outline-primary" style=""><strong>Deposit</strong></button>
+                        <button type="button" class="btn btn-outline-primary" style="" onclick="prepareSendMoneyTransaction()"><strong>Send</strong></button>
+
+                    </td>
+
+                </tr>
+
+            </table>
+        </div>
+    </div>
+    <!--"-->
+
+    <div hidden>
+        <h1>Login Content</h1>
+        <label style=""> Address:</label>
+        <input type="text" class="form-control" id="LoginID" value=@Model.AccountAddress>
+        <br />
+        <label> Password:</label>
+        <input type="text" class="form-control" id="LoginPassword" value=@Model.AccountPassword>
+        <br />
+        <label> Balance:</label>
+        <input type="text" class="form-control" id="LoginBalance" value=@Model.AccountBalance>
+        <br />
+        <h2>@Model.AccountAddress  </h2>
+        <br />
+        <h2>@Model.AccountPassword</h2>
+        <br />
+        <h2>@Model.AccountBalance</h2>
+    </div>
+</body>
+</html>

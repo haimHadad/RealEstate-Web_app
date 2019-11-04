@@ -1,0 +1,30 @@
+﻿
+@{
+    ViewData["Title"] = "LoginError";
+}
+
+
+    <div class="page">
+        <br /><br /><br /><br /><br /><br /><br /><br /><br /><br /><br />
+        <img src="\img\myloogo.png" class="LoginImage" ">
+
+        <br />
+        <h1 align="center" style="font-size:40px" class="text-muted">@ViewData["ErrorMessage"]</h1>
+
+        <br />
+        @using (Html.BeginForm("LoginError", "Account"))
+        {
+            <form class="form-group" method="post" id="loginFail" action="Login">
+                <center>
+                    <div>
+                        <input id="loginBtn" class="btn btn-danger" style="width:20% ;" type="submit" value="Try Again">
+                        <img src="/img/returnFailAccount.png" style="height:20px; width:20px; position:relative; top: 1px; left: -180px; margin:0 auto ">
+
+                    </div>
+                </center>
+            </form>
+        }
+        
+
+    </div>
+

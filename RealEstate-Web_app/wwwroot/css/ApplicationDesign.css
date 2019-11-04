@@ -1,0 +1,187 @@
+﻿
+.buttons, .page {
+    width: 300px;
+    margin: 20px auto;
+}
+
+.buttons {
+    text-align: center;
+}
+
+.page {
+    padding: 1px;
+    min-height: 950px;
+    min-width: 1100px;
+    
+}
+
+.container {
+    position: absolute;
+    top: 55%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+}
+
+.LoginImage {
+    padding: 0;
+    display: block;
+    margin: 0 auto;
+    max-height: 75%;
+    max-width: 75%;
+}
+
+.form-control {
+    width: 70%;
+}
+
+#public-Key-input {
+    display: inline-flex;
+}
+
+
+
+#balance-zone {
+    background-color: #808080;
+    width: 394px;
+    height: 100px;
+}
+
+#mainWindow {
+    display: inline-flex;
+}
+
+.middleWindow {
+    overflow-y: scroll;
+}
+
+#rightWindow {
+    height: 700px;
+}
+
+.vl {
+    border-left: 2px solid green;
+    height: 220px;
+    border-color: lightgray;
+}
+
+
+.btn span.icon {
+    background: url(imgs/contract.png) no-repeat;
+    float: left;
+    width: 10px;
+    height: 40px;
+}
+
+
+
+#imgMsg {
+    -webkit-transform: rotate(-45deg);
+    -moz-transform: rotate(-45deg);
+    -o-transform: rotate(-45deg);
+    -ms-transform: rotate(-45deg);
+    transform: rotate(-45deg);
+}
+
+
+.buttons, .page {
+    width: 300px;
+    margin: 20px auto;
+}
+
+.buttons {
+    text-align: center;
+}
+
+.page {
+    padding: 1px;
+    min-height: 950px;
+    min-width: 1100px;
+    <!-- border: 1px solid silver; -->
+}
+
+.container {
+    position: absolute;
+    top: 55%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+}
+
+.LoginImage {
+    padding: 0;
+    display: block;
+    margin: 0 auto;
+    max-height: 75%;
+    max-width: 75%;
+}
+
+.form-control {
+    width: 70%;
+}
+
+#public-Key-input {
+    display: inline-flex;
+}
+
+#upperWindow {
+    width: 106.5%;
+    background-color: #ffe699 /* #F5F5DC*/;
+    position: relative;
+    top: -840px;
+    left: 29%;
+}
+
+#leftWindow {
+    background-color: #e6e6ff;
+    border-radius: 0.3rem;
+    height: 845px;
+    width: 560px;
+    position: relative;
+    top: 5px;
+    left: -27.9%;
+    border-right: 30px solid #ccccff;
+    /*top: -40px;
+    left: -28%;*/
+    /*top: -88px;
+    left: -397px;*/
+    /*border-right: 65px solid black;*/
+}
+
+
+
+#balance-zone {
+    background-color: #808080;
+    width: 529.5px;
+    height: 100px;
+}
+
+#mainWindow {
+    display: inline-flex;
+}
+
+.middleWindow {
+    overflow-y: scroll;
+}
+
+#rightWindow {
+    height: 700px;
+}
+
+
+
+.vl {
+    border-left: 2px solid green;
+    height: 220px;
+    border-color: lightgray;
+}
+
+
+.btn span.icon {
+    background: url(imgs/contract.png) no-repeat;
+    float: left;
+    width: 10px;
+    height: 40px;
+}
+
+
+
+

@@ -1,0 +1,61 @@
+﻿@{
+    ViewData["Title"] = "Login";
+}
+
+@section scripts{
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    
+    <script>
+        function SetOx() {
+            if ($('#AccountAddress').val() == "")
+            {
+                 $("#AccountAddress").val("0x"); 
+            }
+                    
+        }
+
+    </script>
+}
+
+<div class="page">
+    <br /> <br />
+    <img src="\img\myloogo.png" class="LoginImage" ">
+
+    <br />
+    <img src="\img\Houses.jpg" class="LoginImage" style="position: relative; top: 0px; width:700px">
+    <br />
+    <h2 align="center" style="font-size:40px" class="text-muted">Real Estate Exchange Application</h2>
+    <h3 align="center" style="font-size:20px" class="text-muted">Through Ethereum Blockchain Based Smart Contracts  </h3>
+
+    <br />
+    @using (Html.BeginForm("Login", "Account"))
+    {
+        <form class="form-group" method="post" id="loginForm" action="Login">
+            
+            <center>
+                <input name="AccountAddress" type="text" class="form-control" required="required" id="AccountAddress" placeholder="Enter Your Account Address" style="width:50%" onclick="SetOx()">
+                <br />
+                <input name="AccountPassword" type="password" class="form-control" required="required" id="AccountprivateKey" placeholder="Enter Your Account Private Key" style="width:50%">
+                <label style=" padding-right:15% ; font-size:12px">*In order to use the system your must have an Ethereum wallet upfront</label>
+                <div class="buttons" style="position:relative;left:5%">
+                    <input id="loginBtn" class="btn btn-success" style="width:50% ;" type="submit" value="  Login">
+                    <img src="img/login.png" style="height:18px; width:18px; position:relative; top: 1px; left: -125px; margin:0 auto " />
+                    <select class="custom-select" style="width:34%; height:5%;font-size:small" id="networkTypeCombo" name="AccountNetwork">
+                        <option value="MAINNET">MAINNET</option>
+                        <option value="TESTNET">TESTNET</option>
+                    </select>
+                </div>
+            </center>
+        </form>
+    }
+
+
+
+    <div class="ErorMsg" id="ErrorLogin" style="position:relative; left: 175px ; top:-85px; font-size:12px">
+        <label hidden style="color:red; font-size:12px">Wrong Private-key. Please try again</label>
+    </div>
+</div>
+
+
+
+
