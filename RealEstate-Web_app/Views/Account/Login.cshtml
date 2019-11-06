@@ -74,7 +74,28 @@
                     
         }
 
-  
+        /*$("#RecipientBalance").inputFilter(
+         * function(value) 
+         * {
+                        return /^-?\d*[.,]?\d*$/.test(value); 
+           });
+*/
+         /*(function($) {
+            $.fn.inputFilter = function(inputFilter) {
+                return this.on("input keydown keyup mousedown mouseup select contextmenu drop", function() {
+                if (inputFilter(this.value)) {
+                    this.oldValue = this.value;
+                    this.oldSelectionStart = this.selectionStart;
+                    this.oldSelectionEnd = this.selectionEnd;
+                }
+                else if (this.hasOwnProperty("oldValue"))
+                {
+                    this.value = this.oldValue;
+                    this.setSelectionRange(this.oldSelectionStart, this.oldSelectionEnd);
+                }
+                 });
+                };
+            }(jQuery));*/
 
         function prepareSendMoneyTransaction()
         {
@@ -93,42 +114,13 @@
                  document.getElementById("sendMoneyDiv").style.border = "none"; 
 
             }
- 
-        }
 
-        function SendMoneyTransaction() {
-            var RecipientAddress = $('#RecipientAddressInput').val();
-            var tranferValueETH = $('#RecipientAmmountInput').val();
-            var contextText = "";
-            var TransferToCategory = "Transfer To:";
-            var EthToCategory = "ETH Ammount:";
-            TransferToCategory = TransferToCategory.bold();
-            EthToCategory = EthToCategory.bold();
-            var finaltxt = "ETH Transfered successfully";
-
-            contentTxt = ""+ TransferToCategory  +" "+ RecipientAddress;
-            contentTxt = contentTxt + "\n" + EthToCategory + " " + tranferValueETH + " ETH" ;
-
-            new duDialog('Transfer ETH', contentTxt, duDialog.OK_CANCEL, {
-                
-                okText: 'Approve', cancelText: 'Deny',
-                callbacks: {
-                    okClick: function () {
-                        this.hide(); // hides the dialog; // do something
-                        prepareSendMoneyTransaction();
-                    },
-
-                    cancelClick: function () {
-                        this.hide(); // hides the dialog; // do something
-                    }
-
-                }
-
-            });
+            //$('#sendMoneyForm').style.display = "block";
             
-
-
-
+            //$('#RecipientAddressInput').show();
+            //$('#sendMoneyForm').hide();
+            
+            
         }
         
     </script>
@@ -245,7 +237,9 @@
 
                     <td style=" margin-left:00px ; background-color: #c3c3a2; " id="sendMoneyDiv">
                         <div id="sendMoneyForm" style="display:none;  " class="">
-                            
+                            @using (Html.BeginForm("Login", "Account"))
+                            {
+                                <form class="form-group" method="post" id="sendETH" action="SendEthAction" style="">
                                     <table>
                                         <tr style="">
                                             <!--first line-->
@@ -257,18 +251,18 @@
                                         <tr style="">
                                             <!--second line-->
                                             <td style="">
-                                                <input name="RecipientAmmountInput" type="number" class="form-control" required="required" id="RecipientAmmountInput" placeholder="Enter Ammount" style=" " min="0" max=@Model.AccountBalance>
+                                                <input name="RecipientBalance" type="number" class="form-control" required="required" id="RecipientAmmountInput" placeholder="Enter Ammount" style=" " min="0" max=@Model.AccountBalance>
                                             </td>
                                             <td>
                                                 <a style="color:blue;  " onclick="prepareSendMoneyTransaction()" href="javascript:void(0);"><strong>Cancel</strong></a>
                                             </td>
                                             <td style="padding-left:20px">
-                                                <a style="color:blue;" href="javascript:void(0);"  onclick="SendMoneyTransaction()"><strong>Next></strong></a>
+                                                <a style="color:blue;  "><strong>Next></strong></a>
                                             </td>
                                         </tr>
                                     </table>
-                                
-                            
+                                </form>
+                            }
                         </div>
                     </td>
 
