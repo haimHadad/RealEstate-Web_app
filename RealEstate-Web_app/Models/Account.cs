@@ -27,12 +27,7 @@ namespace RealEstate_Web_app.Models
 
         public String InfuraApiKey { get; set; }
 
-        
-
         public List<Asset> Account_RE_Assets { get; set; }
-
-        
-
 
 
         public Account(String _address, String _password, String _network) : base(_password)
