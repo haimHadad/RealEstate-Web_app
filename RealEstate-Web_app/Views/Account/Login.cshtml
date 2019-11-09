@@ -46,7 +46,7 @@
             var labelILS2 = document.getElementById("ILS-Value2");   /* Get the text field */
             
             var cal, cal2;
-            cal1 = 638.2;
+            
             cal1 = @Model.getExchangeRate_ETH_To_ILS(); 
             
             if (cal1 == -1) {
@@ -96,9 +96,35 @@
  
         }
 
-        function SendMoneyTransaction() {
-            var RecipientAddress = $('#RecipientAddressInput').val();
+        
+
+        
+        function SendMoneyTransaction()
+        { 
+            var url = "/SendDepositETH/SendMoney";
+            var recipientAddress = $('#RecipientAddressInput').val();
             var tranferValueETH = $('#RecipientAmmountInput').val();
+            var check = parseFloat(tranferValueETH);
+            if (check < 0 || check == 0 || check > @Model.AccountBalance)
+            {
+                new duDialog('Error','Amount value is ilegal');
+                return;
+            }
+
+            if (recipientAddress =="" || tranferValueETH == "")
+            {
+                new duDialog('Error','Empty field');
+                return;
+            }
+
+            if (recipientAddress == @Model.AccountAddress)
+            {
+                new duDialog('Error', 'You cannot transfer Eth to yourself');
+                return;
+
+            }
+
+
             var contextText = "";
             var TransferToCategory = "Transfer To:";
             var EthToCategory = "ETH Ammount:";
@@ -106,7 +132,7 @@
             EthToCategory = EthToCategory.bold();
             var finaltxt = "ETH Transfered successfully";
 
-            contentTxt = ""+ TransferToCategory  +" "+ RecipientAddress;
+            contentTxt = ""+ TransferToCategory  +" "+ recipientAddress;
             contentTxt = contentTxt + "\n" + EthToCategory + " " + tranferValueETH + " ETH" ;
 
             new duDialog('Transfer ETH', contentTxt, duDialog.OK_CANCEL, {
@@ -115,8 +141,21 @@
                 callbacks: {
                     okClick: function () {
                         this.hide(); // hides the dialog; // do something
-                       new duDialog(finaltxt,'');
-                       prepareSendMoneyTransaction();
+
+                        $.post(url, { AddressTo: recipientAddress, Amount: tranferValueETH }, function (data) {
+
+                            if (data == false)
+                            {
+                                new duDialog('Error','The recipient address is ilegal');
+                                return;
+                                
+                            }
+                                new duDialog(finaltxt,'');
+                                prepareSendMoneyTransaction();
+                             $("#RecipientAddressInput").val(data); 
+
+                             })
+                       
                     },
 
                     cancelClick: function () {
@@ -126,8 +165,24 @@
                 }
 
             });
+
+
+
+
+
+
+
+
             
 
+
+
+             
+
+
+            
+            
+            
 
 
         }
@@ -242,34 +297,34 @@
                                 </div>
                             </center>
                         </div>
-                    </td> 
+                    </td>
 
                     <td style=" margin-left:00px ; background-color: #c3c3a2; " id="sendMoneyDiv">
                         <div id="sendMoneyForm" style="display:none;  " class="">
-                            
-                                    <table>
-                                        <tr style="">
-                                            <!--first line-->
-                                            <td>
-                                                <input style=" width:200px; " name="RecipientAddress" type="text" class="form-control" required="required" id="RecipientAddressInput" placeholder="Enter Recipient Address" onclick="SetOx()">
-                                            </td>
 
-                                        </tr>
-                                        <tr style="">
-                                            <!--second line-->
-                                            <td style="">
-                                                <input name="RecipientAmmountInput" type="number" class="form-control" required="required" id="RecipientAmmountInput" placeholder="Enter Ammount" style=" " min="0" max=@Model.AccountBalance>
-                                            </td>
-                                            <td>
-                                                <a style="color:blue;  " onclick="prepareSendMoneyTransaction()" href="javascript:void(0);"><strong>Cancel</strong></a>
-                                            </td>
-                                            <td style="padding-left:20px">
-                                                <a style="color:blue;" href="javascript:void(0);"  onclick="SendMoneyTransaction()"><strong>Next></strong></a>
-                                            </td>
-                                        </tr>
-                                    </table>
-                                
-                            
+                            <table>
+                                <tr style="">
+                                    <!--first line-->
+                                    <td>
+                                        <input style=" width:200px; " name="RecipientAddress" type="text" class="form-control" required="required" id="RecipientAddressInput" placeholder="Enter Recipient Address" onclick="SetOx()">
+                                    </td>
+
+                                </tr>
+                                <tr style="">
+                                    <!--second line-->
+                                    <td style="">
+                                        <input name="RecipientAmmountInput" type="number" class="form-control" required="required" id="RecipientAmmountInput" placeholder="Enter Ammount" style=" " min="0" max=@Model.AccountBalance>
+                                    </td>
+                                    <td>
+                                        <a style="color:blue;  " onclick="prepareSendMoneyTransaction()" href="javascript:void(0);"><strong>Cancel</strong></a>
+                                    </td>
+                                    <td style="padding-left:20px">
+                                        <a style="color:blue;" href="javascript:void(0);"  onclick="SendMoneyTransaction()" id="nextButton"><strong>Next></strong></a>
+                                    </td>
+                                </tr>
+                            </table>
+
+                            <!---->
                         </div>
                     </td>
 

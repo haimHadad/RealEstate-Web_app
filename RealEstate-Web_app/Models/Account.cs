@@ -18,7 +18,7 @@ namespace RealEstate_Web_app.Models
         [Required]
         public String AccountPassword { get; set; }
 
-        public double AccountBalance;
+        public double AccountBalance { get; set; }
 
         public Boolean IsValidated { get; set; }
 
@@ -33,8 +33,9 @@ namespace RealEstate_Web_app.Models
         public Account(String _address, String _password, String _network) : base(_password)
         {
             
-              AccountAddress = _address;
+            AccountAddress = _address;
             AccountPassword = _password;
+            InfuraApiKey = "4dc41c6f591d4d61a3a2e32a219c6635";
             AccountBalance = 0;
             Account_RE_Assets = new List<Asset>();
             IsValidated = false;
@@ -61,6 +62,7 @@ namespace RealEstate_Web_app.Models
             AccountAddress = _address;
             AccountPassword = _password;
             AccountBalance = _balance;
+            InfuraApiKey = "4dc41c6f591d4d61a3a2e32a219c6635";
         }
 
         public void  addAsset(Asset _asset)
@@ -128,7 +130,11 @@ namespace RealEstate_Web_app.Models
                  }
             }
             return exchangeRate;
+            
         }
+
+
+      
        
     }
 

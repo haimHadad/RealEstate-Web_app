@@ -45,26 +45,10 @@ namespace RealEstate_Web_app.Controllers
                 {
                     throw new WrongAccountDetails("Incorrect account or password");
                 }
-                acc.InfuraApiKey = "4dc41c6f591d4d61a3a2e32a219c6635";
+                //acc.InfuraApiKey = "4dc41c6f591d4d61a3a2e32a219c6635";
                 Account.ValidateAddress(acc.AccountAddress);
                 var web3 = new Web3(acc.AccountNetwork + "" + acc.InfuraApiKey);
-                
-                var balance = await web3.Eth.GetBalance.SendRequestAsync(acc.AccountAddress); ///*"https://ropsten.infura.io/v3/4dc41c6f591d4d61a3a2e32a219c6635"*/
-                var etherAmount = Web3.Convert.FromWei(balance.Value);
-                double tempBalance = (double)etherAmount;
-
-                //acc.AccountBalance = Math.Round(tempBalance, 4);
-                tempBalance = Math.Truncate(tempBalance * 10000) / 10000;
-
-                acc.AccountBalance = tempBalance;//Complete details of myAccount (real ETH balance of the wallet)
-                //acc.AccountBalance = Math.Round(tempBalance, 2); ;
-                //double money = await acc.GetAccountBalance();                                         =>Ignore! 
-                //var privateKey = "8a24eeca6f3d9fc95b27b187c7240ae9b279ed73484fba3e486fcb4afc463121";  =>Ignore!
-                //var privateKey2 = "ce155c9664386764ee49f72aa0e5d2820c7dee301154b545e26e69f6408f4d34"; =>Ignore!
-                //var ValidateAccount = new Nethereum.Web3.Accounts.Account(privateKey2);               =>Ignore!
-                //var transaction = await web3.TransactionManager.SendTransactionAsync(acc.AccountAddress, acc.AccountAddress, new Nethereum.Hex.HexTypes.HexBigInteger(1)); =>Ignore!
-                //var unlockAccountResult = await web3.Personal.UnlockAccount.SendRequestAsync(acc.AccountAddress, acc.AccountPassword, 60);                                 =>Ignore!
-
+                acc.AccountBalance = await getAccountBalanceFromBlockChainAsync(acc, acc.AccountAddress);
                 String declaredAddress = acc.AccountAddress;    //address from son = textbox of our web dApp = Account class that Haim created
                 String realAddress = acc.Address;               //address from father = Nethereum Speciel Class of Account 
                 if (declaredAddress.Equals(realAddress))        //If the addresses are matched => Login details are correct = > dApp will show wallt(account) content in the next view
@@ -84,27 +68,21 @@ namespace RealEstate_Web_app.Controllers
                 ViewData["ErrorMessage"] = ex.Message; 
                 return View("LoginFail");
             }
+
+
+            //var balance = await web3.Eth.GetBalance.SendRequestAsync(acc.AccountAddress); ///*"https://ropsten.infura.io/v3/4dc41c6f591d4d61a3a2e32a219c6635"*/
+            // var etherAmount = Web3.Convert.FromWei(balance.Value);
+            //double tempBalance = (double)etherAmount;
+            // tempBalance = Math.Truncate(tempBalance * 10000) / 10000;
+            //acc.AccountBalance = tempBalance;//Complete details of myAccount (real ETH balance of the wallet)
+            //acc.AccountBalance = Math.Round(tempBalance, 2); ;
+            //double money = await acc.GetAccountBalance();                                         =>Ignore! 
+            //var privateKey = "8a24eeca6f3d9fc95b27b187c7240ae9b279ed73484fba3e486fcb4afc463121";  =>Ignore!
+            //var privateKey2 = "ce155c9664386764ee49f72aa0e5d2820c7dee301154b545e26e69f6408f4d34"; =>Ignore!
+            //var ValidateAccount = new Nethereum.Web3.Accounts.Account(privateKey2);               =>Ignore!
+            //var transaction = await web3.TransactionManager.SendTransactionAsync(acc.AccountAddress, acc.AccountAddress, new Nethereum.Hex.HexTypes.HexBigInteger(1)); =>Ignore!
+            //var unlockAccountResult = await web3.Personal.UnlockAccount.SendRequestAsync(acc.AccountAddress, acc.AccountPassword, 60);                                 =>Ignore!
         }
-        
-        /*public async Task<TransactionReceipt> MineAndGetReceiptAsync(Web3 web3, string transactionHash)
-        {
-            var web3Geth = new Web3Geth(web3.Client);
-            var miningResult = await web3Geth.Miner.Start.SendRequestAsync(6); ;
-            if (miningResult != true) throw new Exception("Could not start mining");
-
-            var receipt = await web3.Eth.Transactions.GetTransactionReceipt.SendRequestAsync(transactionHash);
-
-            while (receipt == null)
-            {
-                Thread.Sleep(1000);
-                receipt = await web3.Eth.Transactions.GetTransactionReceipt.SendRequestAsync(transactionHash);
-            }
-
-            miningResult = await web3Geth.Miner.Stop.SendRequestAsync();
-            return receipt;
-        }*/
-        //this function ^^ not needed becasue we use infura instead of local node
-
 
 
 
@@ -165,10 +143,20 @@ namespace RealEstate_Web_app.Controllers
             int i2 = 1;
 
             //----------------------------------------- Deploy and interact contract using Nethereum only --------------------------------------------
-
+            //var transaction = await web3Test.Eth.GetEtherTransferService().TransferEtherAndWaitForReceiptAsync(recipientAddressTest, 1.11m +3);
         }
 
-
+        public async Task<double> getAccountBalanceFromBlockChainAsync(Account myAccount , String AccountAddress)
+        {
+            if(AccountAddress == null || myAccount == null)
+                return -1;
+            var myWeb3 = new Web3(myAccount.AccountNetwork + "" + myAccount.InfuraApiKey);
+            var balance = await myWeb3.Eth.GetBalance.SendRequestAsync(AccountAddress); 
+            var etherAmount = Web3.Convert.FromWei(balance.Value);
+            double tempBalance = (double)etherAmount;
+            tempBalance = Math.Truncate(tempBalance * 10000) / 10000;
+            return tempBalance;
+        }
 
     }
 
