@@ -55,6 +55,7 @@ namespace RealEstate_Web_app.Controllers
                 {
                     acc.IsValidated = true;
                     myAccount = acc;
+                    SmartContractInteractExample();
                     //SmartContractInteractExample();
                     return View("Login", acc);
                 }
@@ -112,29 +113,19 @@ namespace RealEstate_Web_app.Controllers
             var accountTest = new Nethereum.Web3.Accounts.Account(senderPrivateKeyTest);
             var web3Test = new Web3(accountTest, myAccount.AccountNetwork + "" + myAccount.InfuraApiKey);
 
-            //----------------------------------------- Interact  deployed contract (using RemixIDE and MetaMask --------------------------------------------
-
-            /*var contractTest = web3Test.Eth.GetContract(contractABI, contractAddress);
-            var transaction = await web3Test.Eth.GetEtherTransferService().TransferEtherAndWaitForReceiptAsync(contractAddress, 2.00m, 2, new BigInteger(25000));
-            var wieEtherTest = 1000000000000000000; // = 1 ETH
-            var getBalanceFunction = contractTest.GetFunction("getBalance");
-            var resultGetBalance = await getBalanceFunction.CallAsync<UInt64>(); // work
-            var sendFunction = contractTest.GetFunction("send");
-            var gas = await sendFunction.EstimateGasAsync(senderAddressTest, null, null, recipientAddressTest, wieEtherTest);
-            var receiptAmountSend =await sendFunction.SendTransactionAndWaitForReceiptAsync(senderAddressTest, gas, null, null, recipientAddressTest, wieEtherTest);
-            int i = 1;*/
-
-            //----------------------------------------- Interact deployed contract (using RemixIDE and Metamask --------------------------------------------
-
-
             //----------------------------------------- Deploy and interact contract using Nethereum only --------------------------------------------
 
+            double EtherToSend = 0.5;
+            decimal moneyDeafult = 1.00m;
+            decimal EtherToSendDecimal = Convert.ToDecimal(EtherToSend);
+            
             var contractByteCode = "0x608060405234801561001057600080fd5b5061011d806100206000396000f3fe60806040526004361060265760003560e01c806312065fe0146028578063d0679d3414604c575b005b348015603357600080fd5b50603a6095565b60408051918252519081900360200190f35b348015605757600080fd5b50608160048036036040811015606c57600080fd5b506001600160a01b038135169060200135609a565b604080519115158252519081900360200190f35b303190565b6000303182111560a957600080fd5b6040516001600160a01b0384169083156108fc029084906000818181858888f1935050505015801560de573d6000803e3d6000fd5b506001939250505056fea265627a7a723158207853790325ad5a0a48cccfd3f1d8bd7b195dafeaa0b0f8d9e899ea78a42e667a64736f6c634300050b0032";
             var receiptContract = await web3Test.Eth.DeployContract.SendRequestAndWaitForReceiptAsync(contractABI, contractByteCode, senderAddressTest, new HexBigInteger(900000), null); //deploy the contract, 900000=time to deploy-constant, after null, we can addparameters to the constructor of the contract
             var contractAddress2 = receiptContract.ContractAddress; //after deployment, we get contrqact address. 
             var contractTest2 = web3Test.Eth.GetContract(contractABI, contractAddress2); //read instance of the contract
-            var transaction2 = await web3Test.Eth.GetEtherTransferService().TransferEtherAndWaitForReceiptAsync(contractAddress2, 1.00m, 2, new BigInteger(25000)); //send money to the contract, everything is constant except the address and the amount - 1.00m = 1ether in decimal. the 2 after 1.00m is gas price which means the speed for mining.
-            var wieEtherTest2 = 1000000000000000000; // = 1 ETH
+            var transaction2 = await web3Test.Eth.GetEtherTransferService().TransferEtherAndWaitForReceiptAsync(contractAddress2, EtherToSendDecimal, 2, new BigInteger(25000)); //send money to the contract, everything is constant except the address and the amount - 1.00m = 1ether in decimal. the 2 after 1.00m is gas price which means the speed for mining.
+            var wieEtherTest2 = 1000000000000000000; // = 1 ETH to send from the contract to someone
+            
             var getBalanceFunction2 = contractTest2.GetFunction("getBalance"); //find the method of the contract 
             var resultGetBalance2 = await getBalanceFunction2.CallAsync<UInt64>(); // calling the method of the contract named -getBalance. Uint64 is the type that returns from the method
             var sendFunction2 = contractTest2.GetFunction("send");  //find the method of the contract 
