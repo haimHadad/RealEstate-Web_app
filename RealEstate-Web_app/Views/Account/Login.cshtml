@@ -101,7 +101,6 @@
         
         function SendMoneyTransaction()
         { 
-            var url = "/SendDepositETH/SendMoney";
             var recipientAddress = $('#RecipientAddressInput').val();
             var tranferValueETH = $('#RecipientAmmountInput').val();
             var check = parseFloat(tranferValueETH);
@@ -141,10 +140,11 @@
                 callbacks: {
                     okClick: function () {
                         this.hide(); // hides the dialog; // do something
+                        var url = "/SendDepositETH/SendMoney";
 
                         $.post(url, { AddressTo: recipientAddress, Amount: tranferValueETH }, function (data) {
 
-                            if (data == false)
+                          /*  if (data == false)
                             {
                                 new duDialog('Error','The recipient address is ilegal');
                                 return;
@@ -152,9 +152,11 @@
                             }
                                 new duDialog(finaltxt,'');
                                 prepareSendMoneyTransaction();
+                                
                              $("#RecipientAddressInput").val(data); 
-
-                             })
+                             */
+                        })
+            
                        
                     },
 

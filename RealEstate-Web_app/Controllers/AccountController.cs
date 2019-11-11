@@ -69,7 +69,7 @@ namespace RealEstate_Web_app.Controllers
                 return View("LoginFail");
             }
 
-
+            
             //var balance = await web3.Eth.GetBalance.SendRequestAsync(acc.AccountAddress); ///*"https://ropsten.infura.io/v3/4dc41c6f591d4d61a3a2e32a219c6635"*/
             // var etherAmount = Web3.Convert.FromWei(balance.Value);
             //double tempBalance = (double)etherAmount;

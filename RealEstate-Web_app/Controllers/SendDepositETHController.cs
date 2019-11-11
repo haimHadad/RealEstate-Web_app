@@ -13,31 +13,37 @@ namespace RealEstate_Web_app.Controllers
     {
 
         [HttpPost]
-        public bool SendMoney(String AddressTo, String Amount)
+        public IActionResult SendMoney(String AddressTo, String Amount)
         {
-            double amountToSend = Convert.ToDouble(Amount);
+           /* double amountToSend = Convert.ToDouble(Amount);
             Account transferFrom = AccountController.myAccount;
             var url = "" + transferFrom.AccountNetwork + "" + transferFrom.InfuraApiKey;
             var myWeb3 = new Web3(transferFrom, url);
+            transferFrom.AccountBalance = amountToSend;  //for example
+            ModelState.Clear();*/
+            return View();
+        }
 
-            try
+        /*try
             {
                 Account.ValidateAddress(AddressTo);
 
             }
             catch(Exception e)
             {
-                return false;
-            }
-                
-            
-            
+                return;
+            }*/
 
 
-            return true;
+
+        [HttpPost]
+        public IActionResult UpdateBalance(Account Wallet)
+        {
+            //Account transferFrom = AccountController.myAccount;
+            Wallet.AccountBalance = 1;
+            ModelState.Clear();
+            return View(Wallet);
         }
-
-
 
 
         [HttpPost]
