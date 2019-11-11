@@ -48,7 +48,9 @@ namespace RealEstate_Web_app.Controllers
                 //acc.AccountBalance = Math.Round(tempBalance, 2); ;
                 //double money = await acc.GetAccountBalance();                                         =>Ignore! 
                 //var privateKey = "8a24eeca6f3d9fc95b27b187c7240ae9b279ed73484fba3e486fcb4afc463121";  =>Ignore!
+                //var publicKey = 0x9Bd6dc66e611Ae28344D52C4CF6167C98A1Aac43;                           =>Ignore!
                 //var privateKey2 = "ce155c9664386764ee49f72aa0e5d2820c7dee301154b545e26e69f6408f4d34"; =>Ignore!
+                //var publicKey2 = 0x7988dfD8E9ceCb888C1AeA7Cb416D44C6160Ef80;                          =>Ignore!
                 //var ValidateAccount = new Nethereum.Web3.Accounts.Account(privateKey2);               =>Ignore!
                 //var transaction = await web3.TransactionManager.SendTransactionAsync(acc.AccountAddress, acc.AccountAddress, new Nethereum.Hex.HexTypes.HexBigInteger(1)); =>Ignore!
                 //var unlockAccountResult = await web3.Personal.UnlockAccount.SendRequestAsync(acc.AccountAddress, acc.AccountPassword, 60);                                 =>Ignore!
