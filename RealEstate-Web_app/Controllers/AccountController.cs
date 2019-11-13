@@ -105,33 +105,52 @@ namespace RealEstate_Web_app.Controllers
 
         async void SmartContractInteractExample()
         {
-            var contractAddress = "0xEf0cFd55488895E63cA368D989405ab348F1BBd7"; //deployed using RemixIDE and MetaMask
-            var contractABI = @"[{""constant"":true,""inputs"":[],""name"":""getBalance"",""outputs"":[{""internalType"":""uint256"",""name"":"""",""type"":""uint256""}],""payable"":false,""stateMutability"":""view"",""type"":""function""},{""constant"":false,""inputs"":[{""internalType"":""address payable"",""name"":""_to"",""type"":""address""},{""internalType"":""uint256"",""name"":""_value"",""type"":""uint256""}],""name"":""send"",""outputs"":[{""internalType"":""bool"",""name"":"""",""type"":""bool""}],""payable"":false,""stateMutability"":""nonpayable"",""type"":""function""},{""payable"":true,""stateMutability"":""payable"",""type"":""fallback""}]";
-            var senderAddressTest = myAccount.AccountAddress;
-            var recipientAddressTest = "0x7988dfD8E9ceCb888C1AeA7Cb416D44C6160Ef80";
-            var senderPrivateKeyTest = myAccount.AccountPassword;
-            var accountTest = new Nethereum.Web3.Accounts.Account(senderPrivateKeyTest);
+            //var contractABI = @"[{""constant"":true,""inputs"":[],""name"":""getBalance"",""outputs"":[{""internalType"":""uint256"",""name"":"""",""type"":""uint256""}],""payable"":false,""stateMutability"":""view"",""type"":""function""},{""constant"":false,""inputs"":[{""internalType"":""address payable"",""name"":""_to"",""type"":""address""},{""internalType"":""uint256"",""name"":""_value"",""type"":""uint256""}],""name"":""send"",""outputs"":[{""internalType"":""bool"",""name"":"""",""type"":""bool""}],""payable"":false,""stateMutability"":""nonpayable"",""type"":""function""},{""payable"":true,""stateMutability"":""payable"",""type"":""fallback""}]";
+            //var contractByteCode = "0x608060405234801561001057600080fd5b5061011d806100206000396000f3fe60806040526004361060265760003560e01c806312065fe0146028578063d0679d3414604c575b005b348015603357600080fd5b50603a6095565b60408051918252519081900360200190f35b348015605757600080fd5b50608160048036036040811015606c57600080fd5b506001600160a01b038135169060200135609a565b604080519115158252519081900360200190f35b303190565b6000303182111560a957600080fd5b6040516001600160a01b0384169083156108fc029084906000818181858888f1935050505015801560de573d6000803e3d6000fd5b506001939250505056fea265627a7a723158207853790325ad5a0a48cccfd3f1d8bd7b195dafeaa0b0f8d9e899ea78a42e667a64736f6c634300050b0032";
+            
+
+            var contractABI = @"[{""constant"":true,""inputs"":[],""name"":""getBalance"",""outputs"":[{""internalType"":""uint256"",""name"":"""",""type"":""uint256""}],""payable"":false,""stateMutability"":""view"",""type"":""function""},{""constant"":true,""inputs"":[],""name"":""getBuyer"",""outputs"":[{""internalType"":""address"",""name"":"""",""type"":""address""}],""payable"":false,""stateMutability"":""view"",""type"":""function""},{""constant"":false,""inputs"":[{""internalType"":""address payable"",""name"":""_to"",""type"":""address""},{""internalType"":""uint256"",""name"":""_value"",""type"":""uint256""}],""name"":""send"",""outputs"":[{""internalType"":""bool"",""name"":"""",""type"":""bool""}],""payable"":false,""stateMutability"":""nonpayable"",""type"":""function""},{""payable"":true,""stateMutability"":""payable"",""type"":""fallback""}]";
+            var contractByteCode = "0x608060405234801561001057600080fd5b50610178806100206000396000f3fe6080604052600436106100345760003560e01c806312065fe014610048578063603daf9a1461006f578063d0679d34146100a0575b600080546001600160a01b03191633179055005b34801561005457600080fd5b5061005d6100ed565b60408051918252519081900360200190f35b34801561007b57600080fd5b506100846100f2565b604080516001600160a01b039092168252519081900360200190f35b3480156100ac57600080fd5b506100d9600480360360408110156100c357600080fd5b506001600160a01b038135169060200135610101565b604080519115158252519081900360200190f35b303190565b6000546001600160a01b031690565b6040516000906001600160a01b0384169083156108fc0290849084818181858888f19350505050158015610139573d6000803e3d6000fd5b506001939250505056fea265627a7a723158201a9f4f8f24e6bad4cf02c24fcedbb062140b4456fa74fa80410eee465a0cf65564736f6c634300050b0032";
+
+            var senderAddress = myAccount.AccountAddress;
+            var recipientAddress = "0x7988dfD8E9ceCb888C1AeA7Cb416D44C6160Ef80";
+            var senderPrivateKey = myAccount.AccountPassword;
+            var accountTest = new Nethereum.Web3.Accounts.Account(senderPrivateKey);
             var web3Test = new Web3(accountTest, myAccount.AccountNetwork + "" + myAccount.InfuraApiKey);
+
+            var payerAccount = new Nethereum.Web3.Accounts.Account("ce155c9664386764ee49f72aa0e5d2820c7dee301154b545e26e69f6408f4d34");
+            var web3Payer = new Web3(payerAccount, myAccount.AccountNetwork + "" + myAccount.InfuraApiKey);
 
             //----------------------------------------- Deploy and interact contract using Nethereum only --------------------------------------------
 
-            double EtherToSend = 0.5;
+            double EtherToSend =1.0;
             decimal moneyDeafult = 1.00m;
             decimal EtherToSendDecimal = Convert.ToDecimal(EtherToSend);
             
-            var contractByteCode = "0x608060405234801561001057600080fd5b5061011d806100206000396000f3fe60806040526004361060265760003560e01c806312065fe0146028578063d0679d3414604c575b005b348015603357600080fd5b50603a6095565b60408051918252519081900360200190f35b348015605757600080fd5b50608160048036036040811015606c57600080fd5b506001600160a01b038135169060200135609a565b604080519115158252519081900360200190f35b303190565b6000303182111560a957600080fd5b6040516001600160a01b0384169083156108fc029084906000818181858888f1935050505015801560de573d6000803e3d6000fd5b506001939250505056fea265627a7a723158207853790325ad5a0a48cccfd3f1d8bd7b195dafeaa0b0f8d9e899ea78a42e667a64736f6c634300050b0032";
-            var receiptContract = await web3Test.Eth.DeployContract.SendRequestAndWaitForReceiptAsync(contractABI, contractByteCode, senderAddressTest, new HexBigInteger(900000), null); //deploy the contract, 900000=time to deploy-constant, after null, we can addparameters to the constructor of the contract
-            var contractAddress2 = receiptContract.ContractAddress; //after deployment, we get contrqact address. 
-            var contractTest2 = web3Test.Eth.GetContract(contractABI, contractAddress2); //read instance of the contract
-            var transaction2 = await web3Test.Eth.GetEtherTransferService().TransferEtherAndWaitForReceiptAsync(contractAddress2, EtherToSendDecimal, 2, new BigInteger(25000)); //send money to the contract, everything is constant except the address and the amount - 1.00m = 1ether in decimal. the 2 after 1.00m is gas price which means the speed for mining.
-            var wieEtherTest2 = 1000000000000000000; // = 1 ETH to send from the contract to someone
-            
-            var getBalanceFunction2 = contractTest2.GetFunction("getBalance"); //find the method of the contract 
-            var resultGetBalance2 = await getBalanceFunction2.CallAsync<UInt64>(); // calling the method of the contract named -getBalance. Uint64 is the type that returns from the method
-            var sendFunction2 = contractTest2.GetFunction("send");  //find the method of the contract 
-            var gas2 = await sendFunction2.EstimateGasAsync(senderAddressTest, null, null, recipientAddressTest, wieEtherTest2); //we calculates the gas for the send method - we must, because this method (send) changing the contract state
-            var receiptAmountSend2 = await sendFunction2.SendTransactionAndWaitForReceiptAsync(senderAddressTest, gas2, null, null, recipientAddressTest, wieEtherTest2); //here we call the send method, after the second null we put the parameters to the method
-            int i2 = 1;
+            var receiptContract = await web3Test.Eth.DeployContract.SendRequestAndWaitForReceiptAsync(contractABI, contractByteCode, senderAddress, new HexBigInteger(900000), null); //deploy the contract, 900000=time to deploy-constant, after null, we can addparameters to the constructor of the contract
+            var contractAddress = receiptContract.ContractAddress; //after deployment, we get contrqact address. 
+            var ContractDeployedInstance = web3Test.Eth.GetContract(contractABI, contractAddress); //read instance of the contract
+            //var transaction = await web3Test.Eth.GetEtherTransferService().TransferEtherAndWaitForReceiptAsync(contractAddress, EtherToSendDecimal, 4, new BigInteger(45000)); //send money to the contract, everything is constant except the address and the amount - 1.00m = 1ether in decimal. the 2 after 1.00m is gas price which means the speed for mining.
+
+            var transaction = await web3Payer.Eth.GetEtherTransferService().TransferEtherAndWaitForReceiptAsync(contractAddress, EtherToSendDecimal, 4, new BigInteger(45000)); //send money to the contract, everything is constant except the address and the amount - 1.00m = 1ether in decimal. the 2 after 1.00m is gas price which means the speed for mining.
+
+            var wieEtherToSend = UnitConversion.Convert.ToWei(1); // = 1 ETH to send from the contract to someone
+
+            var getBuyerFunction = ContractDeployedInstance.GetFunction("getBuyer");  //find the method of the contract 
+            var payer = await getBuyerFunction.CallAsync<String>();
+
+
+            //var getBalanceFunction = ContractDeployedInstance.GetFunction("getBalance"); //find the method of the contract 
+            //var resultGetBalance2 = await getBalanceFunction.CallAsync<UInt64>(); // calling the method of the contract named -getBalance. Uint64 is the type that returns from the method
+            var sendFunction = ContractDeployedInstance.GetFunction("send");  //find the method of the contract 
+
+            //var gas = await sendFunction.EstimateGasAsync(senderAddress, null, null, recipientAddress, wieEtherToSend); //we calculates the gas for the send method - we must, because this method (send) changing the contract state
+            //var receiptAmountSend = await sendFunction.SendTransactionAndWaitForReceiptAsync(senderAddress, gas, null, null, recipientAddress, wieEtherToSend); //here we call the send method, after the second null we put the parameters to the method
+
+            var gas = await sendFunction.EstimateGasAsync(senderAddress, null, null, recipientAddress, wieEtherToSend); //we calculates the gas for the send method - we must, because this method (send) changing the contract state
+            var receiptAmountSend = await sendFunction.SendTransactionAndWaitForReceiptAsync(senderAddress, gas, null, null, recipientAddress, wieEtherToSend); //here we call the send method, after the second null we put the parameters to the method
+
+            int check = 1;
 
             //----------------------------------------- Deploy and interact contract using Nethereum only --------------------------------------------
             //var transaction = await web3Test.Eth.GetEtherTransferService().TransferEtherAndWaitForReceiptAsync(recipientAddressTest, 1.11m +3);
