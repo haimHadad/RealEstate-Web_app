@@ -55,7 +55,7 @@ namespace RealEstate_Web_app.Controllers
                 {
                     acc.IsValidated = true;
                     myAccount = acc;
-                    SmartContractInteractExample();
+                    await SmartContractInteractExample();
                     //SmartContractInteractExample();
                     return View("Login", acc);
                 }
@@ -103,7 +103,7 @@ namespace RealEstate_Web_app.Controllers
         }
 
 
-        async void SmartContractInteractExample()
+        async Task SmartContractInteractExample()
         {
             //var contractABI = @"[{""constant"":true,""inputs"":[],""name"":""getBalance"",""outputs"":[{""internalType"":""uint256"",""name"":"""",""type"":""uint256""}],""payable"":false,""stateMutability"":""view"",""type"":""function""},{""constant"":false,""inputs"":[{""internalType"":""address payable"",""name"":""_to"",""type"":""address""},{""internalType"":""uint256"",""name"":""_value"",""type"":""uint256""}],""name"":""send"",""outputs"":[{""internalType"":""bool"",""name"":"""",""type"":""bool""}],""payable"":false,""stateMutability"":""nonpayable"",""type"":""function""},{""payable"":true,""stateMutability"":""payable"",""type"":""fallback""}]";
             //var contractByteCode = "0x608060405234801561001057600080fd5b5061011d806100206000396000f3fe60806040526004361060265760003560e01c806312065fe0146028578063d0679d3414604c575b005b348015603357600080fd5b50603a6095565b60408051918252519081900360200190f35b348015605757600080fd5b50608160048036036040811015606c57600080fd5b506001600160a01b038135169060200135609a565b604080519115158252519081900360200190f35b303190565b6000303182111560a957600080fd5b6040516001600160a01b0384169083156108fc029084906000818181858888f1935050505015801560de573d6000803e3d6000fd5b506001939250505056fea265627a7a723158207853790325ad5a0a48cccfd3f1d8bd7b195dafeaa0b0f8d9e899ea78a42e667a64736f6c634300050b0032";
