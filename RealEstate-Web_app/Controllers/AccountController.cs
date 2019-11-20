@@ -126,8 +126,12 @@ namespace RealEstate_Web_app.Controllers
             double EtherToSend =1.0;
             decimal moneyDeafult = 1.00m;
             decimal EtherToSendDecimal = Convert.ToDecimal(EtherToSend);
+
             
-            var receiptContract = await web3Test.Eth.DeployContract.SendRequestAndWaitForReceiptAsync(contractABI, contractByteCode, senderAddress, new HexBigInteger(900000), null); //deploy the contract, 900000=time to deploy-constant, after null, we can addparameters to the constructor of the contract
+            var estimateGas = await web3Test.Eth.DeployContract.EstimateGasAsync(contractABI, contractByteCode, senderAddress, null);
+            var receiptContract = await web3Test.Eth.DeployContract.SendRequestAndWaitForReceiptAsync(contractABI, contractByteCode, senderAddress, estimateGas, null); //deploy the contract, 900000=time to deploy-constant, after null, we can add parameters to the constructor of the contract
+
+            //var receiptContract = await web3Test.Eth.DeployContract.SendRequestAndWaitForReceiptAsync(contractABI, contractByteCode, senderAddress, new HexBigInteger(900000), null); //deploy the contract, 900000=time to deploy-constant, after null, we can add parameters to the constructor of the contract
             var contractAddress = receiptContract.ContractAddress; //after deployment, we get contrqact address. 
             var ContractDeployedInstance = web3Test.Eth.GetContract(contractABI, contractAddress); //read instance of the contract
             //var transaction = await web3Test.Eth.GetEtherTransferService().TransferEtherAndWaitForReceiptAsync(contractAddress, EtherToSendDecimal, 4, new BigInteger(45000)); //send money to the contract, everything is constant except the address and the amount - 1.00m = 1ether in decimal. the 2 after 1.00m is gas price which means the speed for mining.
