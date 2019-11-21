@@ -194,7 +194,7 @@ namespace RealEstate_Web_app.Controllers
             var infuraURL = "https://ropsten.infura.io/v3/4dc41c6f591d4d61a3a2e32a219c6635";
             var sellerAccount = new Nethereum.Web3.Accounts.Account(sellerPrivateKey); //login to ethereum account
             var BuyerAccount = new Nethereum.Web3.Accounts.Account(buyerPrivateKey); //login to ethereum account
-            var RegulatorAccount = new Nethereum.Web3.Accounts.Account(regulatorAddress); //login to ethereum account
+            var RegulatorAccount = new Nethereum.Web3.Accounts.Account(regulatorPrivateKey); //login to ethereum account
 
 
             var web3Seller = new Web3(sellerAccount, infuraURL); //connection to ropsten blockchain
@@ -239,36 +239,35 @@ namespace RealEstate_Web_app.Controllers
             var ContractDeployedInstanceAsBuyer = web3Buyer.Eth.GetContract(contractABI, salesContractAddress); //read instance of the contract
             var contractHandlerAsBuyer = web3Buyer.Eth.GetContractHandler(salesContractAddress);
 
-            var getAssetBuyerFunction = ContractDeployedInstanceAsBuyer.GetFunction("getAssetBuyer");   
-            var getAssetBuyer = await getAssetBuyerFunction.CallAsync<string> ();
+            var getAssetBuyerFunctionAsBuyer = ContractDeployedInstanceAsBuyer.GetFunction("getAssetBuyer");   
+            var getAssetBuyerAsBuyer = await getAssetBuyerFunctionAsBuyer.CallAsync<string> ();
 
-            var getAssetDetailsOutputDTO = await contractHandlerAsBuyer.QueryDeserializingToObjectAsync<GetAssetDetailsFunction, GetAssetDetailsOutputDTO>();
-            BigInteger assetID = getAssetDetailsOutputDTO.AssetID;
-            string assetLoaction = getAssetDetailsOutputDTO.AssetLoaction;
-            BigInteger assetRooms = getAssetDetailsOutputDTO.AssetRooms;
-            BigInteger assetAreaIn = getAssetDetailsOutputDTO.AssetAreaIn;
-            string assetImageUrl = getAssetDetailsOutputDTO.AssetImageURL;
-            BigInteger assetPrice = getAssetDetailsOutputDTO.AssetPrice;
+            var getAssetDetailsOutputDTOAsBuyer = await contractHandlerAsBuyer.QueryDeserializingToObjectAsync<GetAssetDetailsFunction, GetAssetDetailsOutputDTO>();
+            BigInteger assetID = getAssetDetailsOutputDTOAsBuyer.AssetID;
+            string assetLoaction = getAssetDetailsOutputDTOAsBuyer.AssetLoaction;
+            BigInteger assetRooms = getAssetDetailsOutputDTOAsBuyer.AssetRooms;
+            BigInteger assetAreaIn = getAssetDetailsOutputDTOAsBuyer.AssetAreaIn;
+            string assetImageUrl = getAssetDetailsOutputDTOAsBuyer.AssetImageURL;
+            BigInteger assetPrice = getAssetDetailsOutputDTOAsBuyer.AssetPrice;
             string assetDetialsAllTogether = ""+ assetID+", "+ assetLoaction + ", "+ assetRooms+", "+ assetAreaIn+", "+ assetImageUrl+", "+ assetPrice;
             //-----------------Buyer reads the deal---------------------
 
 
 
             //-----------------Buyer send money and sign---------------------
-            var getBuyerSigningFunction = ContractDeployedInstanceAsBuyer.GetFunction("getBuyerSigning");
-            var buyerSign = await getBuyerSigningFunction.CallAsync<bool>();
+            var getBuyerSigningFunctionAsBuyer = ContractDeployedInstanceAsBuyer.GetFunction("getBuyerSigning");
+            var buyerSign = await getBuyerSigningFunctionAsBuyer.CallAsync<bool>();
 
             if(buyerSign==false)
             {
-                double EtherToSend = 1.0;
+                double EtherToSend = 3.0;
                 decimal EtherToPay = Convert.ToDecimal(EtherToSend);
                 
                 var payTransaction = await web3Buyer.Eth.GetEtherTransferService().TransferEtherAndWaitForReceiptAsync(salesContractAddress, EtherToPay, 4, new BigInteger(45000)); //send money to the contract, everything is constant except the address and the amount - 1.00m = 1ether in decimal. the 2 after 1.00m is gas price which means the speed for mining.
-                var getContractBalanceFunction = ContractDeployedInstanceAsBuyer.GetFunction("getContractBalance");
-                var salesContractBalance = await getContractBalanceFunction.CallAsync<UInt64>();
-                if(salesContractBalance == UnitConversion.Convert.ToWei(EtherToPay))
+                var getContractBalanceFunctionAsBuyer = ContractDeployedInstanceAsBuyer.GetFunction("getContractBalance");
+                var salesContractBalanceAsBuyer = await getContractBalanceFunctionAsBuyer.CallAsync<UInt64>();
+                if(salesContractBalanceAsBuyer == UnitConversion.Convert.ToWei(EtherToPay))
                 {
-                    var setBuyerSigningFunction = ContractDeployedInstanceAsBuyer.GetFunction("setBuyerSigning");   
                     var setBuyerSigningFunctionTxnReceipt = await contractHandlerAsBuyer.SendRequestAndWaitForReceiptAsync<SetBuyerSigningFunction>();
                 }
 
@@ -279,12 +278,30 @@ namespace RealEstate_Web_app.Controllers
             //-----------------Buyer send money and sign---------------------
 
             //-----------------Government check legality ---------------------
-
-            buyerSign = await getBuyerSigningFunction.CallAsync<bool>();
-
+            var ContractDeployedInstanceAsRegulator = web3Regulator.Eth.GetContract(contractABI, salesContractAddress); //read instance of the contract
+            var contractHandlerAsRegulator = web3Regulator.Eth.GetContractHandler(salesContractAddress);
+            var getBuyerSigningFunctionAsRegulator = ContractDeployedInstanceAsRegulator.GetFunction("getBuyerSigning");
+            buyerSign = await getBuyerSigningFunctionAsRegulator.CallAsync<bool>();
+            var getContractBalanceFunctionAsRegulator = ContractDeployedInstanceAsRegulator.GetFunction("getContractBalance");
+            var salesContractBalanceAsRegulator = await getContractBalanceFunctionAsRegulator.CallAsync<UInt64>();
+            double taxPercentage = 0.02;        
+            double contractBalanceAsDouble = Convert.ToDouble(salesContractBalanceAsRegulator); ;
+            double taxEtherAmountAsDouble = contractBalanceAsDouble* taxPercentage;
+            //UInt64 taxEtherAmountAsWie = Convert.ToUInt64(taxEtherAmountAsDouble);
+  
             if (buyerSign == true)
             {
+                /* ------this is the first way to call approveAndExcecuteContract, and it`s work great!!!! ------
+                var approveAndExcecuteContractFunction = new ApproveAndExcecuteContractFunction();
+                approveAndExcecuteContractFunction.TaxPay = new BigInteger(taxEtherAmountAsDouble);
+                var approveAndExcecuteContractFunctionTxnReceipt = await contractHandlerAsRegulator.SendRequestAndWaitForReceiptAsync(approveAndExcecuteContractFunction);
+                */
 
+                // -----this is a second way to call approveAndExcecuteContract------
+                var approveAndExcecuteContractFunction = ContractDeployedInstanceAsRegulator.GetFunction("approveAndExcecuteContract");  //find the method of the contract 
+                var gasEstimationForApproval = await approveAndExcecuteContractFunction.EstimateGasAsync(regulatorAddress, null, null, new BigInteger(taxEtherAmountAsDouble)); 
+                var receiptAmountSend = await approveAndExcecuteContractFunction.SendTransactionAndWaitForReceiptAsync(regulatorAddress, gasEstimationForApproval, null, null, new BigInteger(taxEtherAmountAsDouble));
+                
             }
 
 
@@ -337,4 +354,15 @@ namespace RealEstate_Web_app.Controllers
     {
 
     }
-}
+    /*
+    public partial class ApproveAndExcecuteContractFunction : ApproveAndExcecuteContractFunctionBase { }
+
+    [Function("approveAndExcecuteContract", "bool")]
+    public class ApproveAndExcecuteContractFunctionBase : FunctionMessage
+    {
+        [Parameter("uint256", "_taxPay", 1)]
+        public virtual BigInteger TaxPay { get; set; }
+    }
+    */
+
+            }
