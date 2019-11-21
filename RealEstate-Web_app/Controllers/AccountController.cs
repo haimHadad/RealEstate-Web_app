@@ -210,7 +210,7 @@ namespace RealEstate_Web_app.Controllers
             var _Rooms = 3;
             var _AreaIn = 110;
             var _Image = "https://media.angieslist.com/s3fs-public/styles/vertical_large/public/colonial%20house%20for%20sale.jpeg?itok=HFDsNQyz";
-            var _price = UnitConversion.Convert.ToWei(1);
+            var _price = UnitConversion.Convert.ToWei(3);
 
             object[] contractParams;
             contractParams = new object[]
@@ -234,15 +234,15 @@ namespace RealEstate_Web_app.Controllers
 
             var salesContractAddress = receiptSalesContract.ContractAddress; //after deployment, we get contract address. 
             var etherscanURL = "https://ropsten.etherscan.io/address/" + salesContractAddress;
-            var ContractDeployedInstance = web3Seller.Eth.GetContract(contractABI, salesContractAddress); //read instance of the contract
 
             //-----------------Buyer reads the deal---------------------
+            var ContractDeployedInstanceAsBuyer = web3Buyer.Eth.GetContract(contractABI, salesContractAddress); //read instance of the contract
+            var contractHandlerAsBuyer = web3Buyer.Eth.GetContractHandler(salesContractAddress);
 
-            var getAssetBuyerFunction = ContractDeployedInstance.GetFunction("getAssetBuyer");   
+            var getAssetBuyerFunction = ContractDeployedInstanceAsBuyer.GetFunction("getAssetBuyer");   
             var getAssetBuyer = await getAssetBuyerFunction.CallAsync<string> ();
 
-            var contractHandler = web3Seller.Eth.GetContractHandler(salesContractAddress);
-            var getAssetDetailsOutputDTO = await contractHandler.QueryDeserializingToObjectAsync<GetAssetDetailsFunction, GetAssetDetailsOutputDTO>();
+            var getAssetDetailsOutputDTO = await contractHandlerAsBuyer.QueryDeserializingToObjectAsync<GetAssetDetailsFunction, GetAssetDetailsOutputDTO>();
             BigInteger assetID = getAssetDetailsOutputDTO.AssetID;
             string assetLoaction = getAssetDetailsOutputDTO.AssetLoaction;
             BigInteger assetRooms = getAssetDetailsOutputDTO.AssetRooms;
@@ -252,6 +252,43 @@ namespace RealEstate_Web_app.Controllers
             string assetDetialsAllTogether = ""+ assetID+", "+ assetLoaction + ", "+ assetRooms+", "+ assetAreaIn+", "+ assetImageUrl+", "+ assetPrice;
             //-----------------Buyer reads the deal---------------------
 
+
+
+            //-----------------Buyer send money and sign---------------------
+            var getBuyerSigningFunction = ContractDeployedInstanceAsBuyer.GetFunction("getBuyerSigning");
+            var buyerSign = await getBuyerSigningFunction.CallAsync<bool>();
+
+            if(buyerSign==false)
+            {
+                double EtherToSend = 1.0;
+                decimal EtherToPay = Convert.ToDecimal(EtherToSend);
+                
+                var payTransaction = await web3Buyer.Eth.GetEtherTransferService().TransferEtherAndWaitForReceiptAsync(salesContractAddress, EtherToPay, 4, new BigInteger(45000)); //send money to the contract, everything is constant except the address and the amount - 1.00m = 1ether in decimal. the 2 after 1.00m is gas price which means the speed for mining.
+                var getContractBalanceFunction = ContractDeployedInstanceAsBuyer.GetFunction("getContractBalance");
+                var salesContractBalance = await getContractBalanceFunction.CallAsync<UInt64>();
+                if(salesContractBalance == UnitConversion.Convert.ToWei(EtherToPay))
+                {
+                    var setBuyerSigningFunction = ContractDeployedInstanceAsBuyer.GetFunction("setBuyerSigning");   
+                    var setBuyerSigningFunctionTxnReceipt = await contractHandlerAsBuyer.SendRequestAndWaitForReceiptAsync<SetBuyerSigningFunction>();
+                }
+
+                
+
+            }
+
+            //-----------------Buyer send money and sign---------------------
+
+            //-----------------Government check legality ---------------------
+
+            buyerSign = await getBuyerSigningFunction.CallAsync<bool>();
+
+            if (buyerSign == true)
+            {
+
+            }
+
+
+            //-----------------Government check legality ---------------------
 
             int i = 1;
             i = 2;
@@ -291,5 +328,13 @@ namespace RealEstate_Web_app.Controllers
         public virtual string AssetImageURL { get; set; }
         [Parameter("uint256", "AssetPrice", 6)]
         public virtual BigInteger AssetPrice { get; set; }
+    }
+
+    public partial class SetBuyerSigningFunction : SetBuyerSigningFunctionBase { }
+
+    [Function("setBuyerSigning")]
+    public class SetBuyerSigningFunctionBase : FunctionMessage
+    {
+
     }
 }
