@@ -268,10 +268,18 @@ namespace RealEstate_Web_app.Controllers
                 var salesContractBalanceAsBuyer = await getContractBalanceFunctionAsBuyer.CallAsync<UInt64>();
                 if(salesContractBalanceAsBuyer == UnitConversion.Convert.ToWei(EtherToPay))
                 {
-                    var setBuyerSigningFunctionTxnReceipt = await contractHandlerAsBuyer.SendRequestAndWaitForReceiptAsync<SetBuyerSigningFunction>();
+                    //first way -working
+                    //var setBuyerSigningFunctionTxnReceipt = await contractHandlerAsBuyer.SendRequestAndWaitForReceiptAsync<SetBuyerSigningFunction>();
+
+                    //second way -working
+                     var setBuyerSigningFunction = ContractDeployedInstanceAsBuyer.GetFunction("setBuyerSigning");  //find the method of the contract 
+                     var gasEstimationForBuyerSigning = await setBuyerSigningFunction.EstimateGasAsync(buyerAddress, null, null);
+                     var receiptAmountSend = await setBuyerSigningFunction.SendTransactionAndWaitForReceiptAsync(buyerAddress, gasEstimationForBuyerSigning, null, null);
+
+
                 }
 
-                
+
 
             }
 
