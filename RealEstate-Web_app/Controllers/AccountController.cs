@@ -305,6 +305,13 @@ namespace RealEstate_Web_app.Controllers
                 var approveAndExcecuteContractFunction = ContractDeployedInstanceAsRegulator.GetFunction("approveAndExcecuteContract");  //find the method of the contract 
                 var gasEstimationForApproval = await approveAndExcecuteContractFunction.EstimateGasAsync(regulatorAddress, null, null, new BigInteger(taxEtherAmountAsDouble)); 
                 var receiptOfApproval = await approveAndExcecuteContractFunction.SendTransactionAndWaitForReceiptAsync(regulatorAddress, gasEstimationForApproval, null, null, new BigInteger(taxEtherAmountAsDouble));
+
+                //we can check if the buyer is the owner now, can be made by everyone:
+                var getNewAssetOwnerFunction = ContractDeployedInstanceAsRegulator.GetFunction("getNewAssetOwner") ;
+                var newOwner = await getNewAssetOwnerFunction.CallAsync<string>();
+                int s = 2;
+
+
                 //----------------------Regulator approves the contract ------------------------------
 
                 //--------------------------Regulator not approves the contract (will not work if the regulator already approved the contract ------------------------------
