@@ -234,7 +234,7 @@ namespace RealEstate_Web_app.Controllers
 
             var salesContractAddress = receiptSalesContract.ContractAddress; //after deployment, we get contract address. 
             var etherscanURL = "https://ropsten.etherscan.io/address/" + salesContractAddress;
-
+            
             //-----------------Buyer reads the deal---------------------
             var ContractDeployedInstanceAsBuyer = web3Buyer.Eth.GetContract(contractABI, salesContractAddress); //read instance of the contract
             var contractHandlerAsBuyer = web3Buyer.Eth.GetContractHandler(salesContractAddress);
@@ -274,13 +274,8 @@ namespace RealEstate_Web_app.Controllers
                     //second way -working
                      var setBuyerSigningFunction = ContractDeployedInstanceAsBuyer.GetFunction("setBuyerSigning");  //find the method of the contract 
                      var gasEstimationForBuyerSigning = await setBuyerSigningFunction.EstimateGasAsync(buyerAddress, null, null);
-                     var receiptAmountSend = await setBuyerSigningFunction.SendTransactionAndWaitForReceiptAsync(buyerAddress, gasEstimationForBuyerSigning, null, null);
-
-
+                     var receiptBuyerSinging = await setBuyerSigningFunction.SendTransactionAndWaitForReceiptAsync(buyerAddress, gasEstimationForBuyerSigning, null, null);
                 }
-
-
-
             }
 
             //-----------------Buyer send money and sign---------------------
@@ -294,22 +289,36 @@ namespace RealEstate_Web_app.Controllers
             var salesContractBalanceAsRegulator = await getContractBalanceFunctionAsRegulator.CallAsync<UInt64>();
             double taxPercentage = 0.02;        
             double contractBalanceAsDouble = Convert.ToDouble(salesContractBalanceAsRegulator); ;
-            double taxEtherAmountAsDouble = contractBalanceAsDouble* taxPercentage;
-            //UInt64 taxEtherAmountAsWie = Convert.ToUInt64(taxEtherAmountAsDouble);
-  
+            double taxEtherAmountAsDouble = contractBalanceAsDouble* taxPercentage;  
             if (buyerSign == true)
             {
-                /* ------this is the first way to call approveAndExcecuteContract, and it`s work great!!!! ------
+                //--------------------------Regulator approves the contract ------------------------------
+
+                //this is the first way to call approveAndExcecuteContract, and it`s work great!!!!
+                /* 
                 var approveAndExcecuteContractFunction = new ApproveAndExcecuteContractFunction();
                 approveAndExcecuteContractFunction.TaxPay = new BigInteger(taxEtherAmountAsDouble);
                 var approveAndExcecuteContractFunctionTxnReceipt = await contractHandlerAsRegulator.SendRequestAndWaitForReceiptAsync(approveAndExcecuteContractFunction);
                 */
 
-                // -----this is a second way to call approveAndExcecuteContract------
+                // this is a second way to call approveAndExcecuteContract
                 var approveAndExcecuteContractFunction = ContractDeployedInstanceAsRegulator.GetFunction("approveAndExcecuteContract");  //find the method of the contract 
                 var gasEstimationForApproval = await approveAndExcecuteContractFunction.EstimateGasAsync(regulatorAddress, null, null, new BigInteger(taxEtherAmountAsDouble)); 
-                var receiptAmountSend = await approveAndExcecuteContractFunction.SendTransactionAndWaitForReceiptAsync(regulatorAddress, gasEstimationForApproval, null, null, new BigInteger(taxEtherAmountAsDouble));
-                
+                var receiptOfApproval = await approveAndExcecuteContractFunction.SendTransactionAndWaitForReceiptAsync(regulatorAddress, gasEstimationForApproval, null, null, new BigInteger(taxEtherAmountAsDouble));
+                //----------------------Regulator approves the contract ------------------------------
+
+                //--------------------------Regulator not approves the contract (will not work if the regulator already approved the contract ------------------------------
+                //If we want to test this section, we need to Put in a comment the previous call ^ ^ ^
+                var cancelContractFunction = ContractDeployedInstanceAsRegulator.GetFunction("cancelContract");  //find the method of the contract 
+                var gasEstimationForCancel = await cancelContractFunction.EstimateGasAsync(regulatorAddress, null, null);
+                var receiptOfCancel = await cancelContractFunction.SendTransactionAndWaitForReceiptAsync(regulatorAddress, gasEstimationForCancel, null, null);
+
+
+
+
+                //--------------------------Regulator not approves the contract ------------------------------
+
+
             }
 
 
