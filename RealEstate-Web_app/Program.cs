@@ -13,12 +13,6 @@ namespace RealEstate_Web_app
     {
         public static void Main(string[] args)
         {
-            OnlineDB test = new OnlineDB();
-            // OnlineDB.ReadAssetsTable();
-            //OnlineDB.getTable(1);
-            OnlineDB.InsertNewEntryToOpenContractsTable("1115", "0x939xxc", "0x8887", "0x22222887");
-
-
             CreateHostBuilder(args).Build().Run();
         }
 
