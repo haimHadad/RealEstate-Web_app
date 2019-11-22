@@ -17,7 +17,8 @@ namespace RealEstate_Web_app
             // OnlineDB.ReadAssetsTable();
             //OnlineDB.getTable(1);
             //OnlineDB.InsertNewEntryToOpenContractsTable("1115", "0x939xxc", "0x8887", "0x22222887");
-            OnlineDB.UpdateNewAssetOwner("ce155c9664386764ee49f72aa0e5d2820c7dee301154b545e26e69f6408f4d34", "1111", "0x9Bd6dc66e611Ae28344D52C4CF6167C98A1Aac43", "0x123");
+            OnlineDB.DeleteEntryToContractsToApproveTable("0x12355");
+            OnlineDB.InsertNewEntryToContractsToApproveTable("0x12355");
 
             CreateHostBuilder(args).Build().Run();
         }

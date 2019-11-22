@@ -17,7 +17,7 @@ namespace RealEstate_Web_app
 
         static readonly string spreadSheetID = "1yoSOZPUto61qwcoD9ApkbyZiOLtkhdcJT47ToIB6DJY";
 
-        static readonly string [] Sheet = { "Assets", "OpenContracts" , "ApprovedContracts" , "RejectedContracts" };
+        static readonly string [] Sheet = { "Assets", "OpenContracts" , "ApprovedContracts" , "RejectedContracts", "ContractsToApprove" };
 
         static SheetsService service;
 
@@ -236,7 +236,7 @@ namespace RealEstate_Web_app
             return true;
         }
 
-        public static bool InsertNewEntryToApprovedContracts(string PrivateKey , string AssetID, string ContractAddress, string Seller, string Buyer)
+        public static bool InsertNewEntryToApprovedContractsTable(string PrivateKey , string AssetID, string ContractAddress, string Seller, string Buyer)
         {
             try
             {
@@ -271,7 +271,7 @@ namespace RealEstate_Web_app
             return true;
         }
 
-        public static bool InsertNewEntryToRejectedContracts(string AssetID, string ContractAddress, int RejectedByCode, string Seller, string Buyer)
+        public static bool InsertNewEntryToRejectedContractsTable(string AssetID, string ContractAddress, int RejectedByCode, string Seller, string Buyer)
         {
             if (RejectedByCode != 0 && RejectedByCode != 1)
                 return false;
@@ -301,6 +301,31 @@ namespace RealEstate_Web_app
 
             return true;
         }
+
+        public static bool InsertNewEntryToContractsToApproveTable(string ContractAddress)
+        {
+            try
+            {
+                var range = $"{Sheet[4]}";
+                var valueRange = new ValueRange();
+                var objectList = new List<object>{ContractAddress};
+                valueRange.Values = new List<IList<object>> { objectList };
+                var appendRequest = service.Spreadsheets.Values.Append(valueRange, spreadSheetID, range);
+                appendRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum.USERENTERED;
+                var appendResponse = appendRequest.Execute();
+
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+
+
+
 
         public static bool UpdateNewAssetOwner(string PrivateKey, string AssetID, string OldOwner, string NewOwner)
         {
@@ -356,6 +381,24 @@ namespace RealEstate_Web_app
             return true;
         }
 
+        public static bool DeleteEntryToContractsToApproveTable(string ContractAddress)
+        {
+            try
+            {
+                var range = $"{Sheet[4]}!A4:B4";
+                var requestBody = new ClearValuesRequest();
+                var deleteRequest = service.Spreadsheets.Values.Clear(requestBody, spreadSheetID, range);
+                var deleteRequest2 = service.Spreadsheets.Values.Clear(requestBody, spreadSheetID, range);
+
+                var deleteResponse = deleteRequest.Execute();
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+
+            return true;
+        }
 
     }
 }
