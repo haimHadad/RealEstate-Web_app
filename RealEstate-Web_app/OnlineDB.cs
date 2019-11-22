@@ -39,6 +39,16 @@ namespace RealEstate_Web_app
             k = 2;
         }
 
+        public static string getLetterByNumber(int num)
+        {
+            if (num<1 || num>26)
+                return null;
+            string[] numerology = new string[26] { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" };
+            return numerology[num - 1];
+            
+        }
+
+
     
         public static List<List<string>> getTable(int tableNO)
         {
@@ -87,9 +97,8 @@ namespace RealEstate_Web_app
             {
                 if (tableNO > (Sheet.Length - 1) || tableNO < 0 || from < 1 || from > to || to < 1 || to > 26)
                     return null;
-                string[] numerology = new string[26] { "A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z" };
-                string colFrom = numerology[from - 1];
-                string colTO = numerology[to - 1];
+                string colFrom = getLetterByNumber(from);
+                string colTO = getLetterByNumber(to);
                 var range = $"{Sheet[tableNO]}!{colFrom}:{colTO}";
                 var request = service.Spreadsheets.Values.Get(spreadSheetID, range);
                 var response = request.Execute();
@@ -193,7 +202,6 @@ namespace RealEstate_Web_app
                 return false;
             }
 
-
             return true;
         }
 
@@ -291,9 +299,63 @@ namespace RealEstate_Web_app
                 return false;
             }
 
+            return true;
+        }
+
+        public static bool UpdateNewAssetOwner(string PrivateKey, string AssetID, string OldOwner, string NewOwner)
+        {
+            try
+            {
+                var RegulatorAccount = new Nethereum.Web3.Accounts.Account(PrivateKey);
+                string PublicKeyRegulaotr = RegulatorAccount.Address;
+                if (!PublicKeyRegulaotr.Equals("0x7988dfD8E9ceCb888C1AeA7Cb416D44C6160Ef80"))
+                    return false;
+                PrivateKey = null;
+                RegulatorAccount = null;
+                if (isAssetExist(AssetID) == false)
+                    return false;
+                List<List<String>> colOfAssetID = getColAtTable(0, 1, 1);
+                if (colOfAssetID == null)
+                    return false;
+                int targetRowNum=-1;
+
+                for(int i =0; i< colOfAssetID.Count; i++)
+                {
+                    if(colOfAssetID.ElementAt(i).Contains(AssetID))
+                    {
+                        targetRowNum = i + 1;
+                        break;
+                    }
+                }
+
+                List<List<String>> colOfOwners = getColAtTable(0, 6, 6);
+                if (colOfAssetID == null)
+                    return false;
+
+                if (colOfOwners.ElementAt(targetRowNum).Contains(OldOwner) == false)
+                    return false;
+
+                string TargetRowStr = ""+ targetRowNum;
+
+                var range = $"{Sheet[0]}!F{TargetRowStr}";
+                var valueRange = new ValueRange();
+                var objectList = new List<object>{ NewOwner };
+                valueRange.Values = new List<IList<object>> { objectList };
+
+                var updateRequest = service.Spreadsheets.Values.Update(valueRange, spreadSheetID, range);
+                updateRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.UpdateRequest.ValueInputOptionEnum.USERENTERED;
+                var appendResponse = updateRequest.Execute();
+                
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+            
 
             return true;
         }
+
 
     }
 }
