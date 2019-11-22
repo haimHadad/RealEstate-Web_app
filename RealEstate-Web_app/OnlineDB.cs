@@ -143,7 +143,7 @@ namespace RealEstate_Web_app
 
 
 
-        public static bool isAssetAvailable(string assetID)
+        public static bool isAssetAvailableForSale(string assetID)
         {
             List<List<String>> colOfAssetID = getColAtTable(1, 1, 1);
 
@@ -158,15 +158,50 @@ namespace RealEstate_Web_app
             return true;
         }
 
+        public static bool InsertNewEntryToAssetsTable(string PrivateKey , string AssetID, string Loaction, string AreaIn, string Rooms, string Image, string Owner)
+        {
+            try
+            {
+                var RegulatorAccount = new Nethereum.Web3.Accounts.Account(PrivateKey);
+                string PublicKeyRegulaotr = RegulatorAccount.Address;
+                if ( !PublicKeyRegulaotr.Equals("0x7988dfD8E9ceCb888C1AeA7Cb416D44C6160Ef80") )
+                    return false;
+                PrivateKey = null;
+                RegulatorAccount = null;
+                if (isAssetExist(AssetID) == true)
+                    return false;
+
+                var range = $"{Sheet[0]}";
+                var valueRange = new ValueRange();
+                var objectList = new List<object>
+                {
+                AssetID,
+                Loaction,
+                AreaIn,
+                Rooms,
+                Image,
+                Owner
+                };
+                valueRange.Values = new List<IList<object>> { objectList };
+                var appendRequest = service.Spreadsheets.Values.Append(valueRange, spreadSheetID, range);
+                appendRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum.USERENTERED;
+                var appendResponse = appendRequest.Execute();
+
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+
+
+            return true;
+        }
 
         public static bool InsertNewEntryToOpenContractsTable(string AssetID, string ContractAddress, string  Seller, string Buyer)
         {
             try 
             {
-                if (isAssetAvailable(AssetID) == false)
-                    return false;
-
-                if (isAssetExist(AssetID) == false)
+                if (isAssetAvailableForSale(AssetID) == false)
                     return false;
 
                 var range = $"{Sheet[1]}";
@@ -193,6 +228,72 @@ namespace RealEstate_Web_app
             return true;
         }
 
-       
+        public static bool InsertNewEntryToApprovedContracts(string PrivateKey , string AssetID, string ContractAddress, string Seller, string Buyer)
+        {
+            try
+            {
+                var RegulatorAccount = new Nethereum.Web3.Accounts.Account(PrivateKey);
+                string PublicKeyRegulaotr = RegulatorAccount.Address;
+                if (!PublicKeyRegulaotr.Equals("0x7988dfD8E9ceCb888C1AeA7Cb416D44C6160Ef80"))
+                    return false;
+                PrivateKey = null;
+                RegulatorAccount = null;               
+
+                var range = $"{Sheet[2]}";
+                var valueRange = new ValueRange();
+                var objectList = new List<object>
+                {
+                AssetID,
+                ContractAddress,  
+                Seller,
+                Buyer
+                };
+                valueRange.Values = new List<IList<object>> { objectList };
+                var appendRequest = service.Spreadsheets.Values.Append(valueRange, spreadSheetID, range);
+                appendRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum.USERENTERED;
+                var appendResponse = appendRequest.Execute();
+
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+
+
+            return true;
+        }
+
+        public static bool InsertNewEntryToRejectedContracts(string AssetID, string ContractAddress, int RejectedByCode, string Seller, string Buyer)
+        {
+            if (RejectedByCode != 0 && RejectedByCode != 1)
+                return false;
+            string[] RejectionParty = new string[2] { "Buyer", "Regulator" };
+            try
+            {
+                var range = $"{Sheet[3]}";
+                var valueRange = new ValueRange();
+                var objectList = new List<object>
+                {
+                AssetID,
+                ContractAddress,
+                RejectionParty[RejectedByCode],
+                Seller,
+                Buyer
+                };
+                valueRange.Values = new List<IList<object>> { objectList };
+                var appendRequest = service.Spreadsheets.Values.Append(valueRange, spreadSheetID, range);
+                appendRequest.ValueInputOption = SpreadsheetsResource.ValuesResource.AppendRequest.ValueInputOptionEnum.USERENTERED;
+                var appendResponse = appendRequest.Execute();
+
+            }
+            catch (Exception e)
+            {
+                return false;
+            }
+
+
+            return true;
+        }
+
     }
 }
