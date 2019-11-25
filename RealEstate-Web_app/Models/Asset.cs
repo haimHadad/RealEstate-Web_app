@@ -9,12 +9,9 @@ namespace RealEstate_Web_app.Models
     {
         private String assetOwner { get; set; }
         private uint  assetID {get; }
-        private String assetStreet { get; set; }
-        private uint assetNo { get; set; }
-        private uint assetCity { get; set; }
+        private String Loaction { get; set; }
         private uint assetRooms { get; set; }
         private uint assetAreaIn { get; set; }
-        private uint assetAreaOut { get; set; }
         private uint assetPrice { get; set; }
 
         public int CompareTo(object obj)
