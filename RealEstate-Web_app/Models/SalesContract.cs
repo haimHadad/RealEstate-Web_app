@@ -212,7 +212,7 @@ namespace RealEstate_Web_app.Models
 
         public async Task<bool> abort() //in case buyer didnt take action in time
         {
-            string SellerAddress = await getBuyerAddress();
+            string SellerAddress = await getAssetOwner();
             bool BuyerSign = await getBuyerSign();
             ulong timeLeft = await getTimeLeftInSeconds();
 
