@@ -114,9 +114,16 @@ namespace RealEstate_Web_app.Models
                 return returnedEther;
         }
 
-        public async Task<string> getAssetOwner()
+        public async Task<string> getNewAssetOwner()
         {
             var getNewAssetOwnerFunction = deployedContractIsntance.GetFunction("getNewAssetOwner");
+            var newOwner = await getNewAssetOwnerFunction.CallAsync<string>();
+            return newOwner;
+        }
+
+        public async Task<string> getOldAssetOwner()
+        {
+            var getNewAssetOwnerFunction = deployedContractIsntance.GetFunction("getOldAssetOwner");
             var newOwner = await getNewAssetOwnerFunction.CallAsync<string>();
             return newOwner;
         }
@@ -127,13 +134,7 @@ namespace RealEstate_Web_app.Models
             var timeLeft = await TimeLeftFunction.CallAsync<UInt64>();
             return timeLeft;
         }
-
-        public async Task<string> getNewAssetOwner()
-        {
-            var getNewAssetOwnerFunction = deployedContractIsntance.GetFunction("getNewAssetOwner");
-            var newOwner = await getNewAssetOwnerFunction.CallAsync<string>();
-            return newOwner;
-        }
+  
 
         public async Task<bool> cancelDeal() //For regulator (=Govrenment)
         {
@@ -212,7 +213,7 @@ namespace RealEstate_Web_app.Models
 
         public async Task<bool> abort() //in case buyer didnt take action in time
         {
-            string SellerAddress = await getAssetOwner();
+            string SellerAddress = await getOldAssetOwner();
             bool BuyerSign = await getBuyerSign();
             ulong timeLeft = await getTimeLeftInSeconds();
 
@@ -260,19 +261,19 @@ namespace RealEstate_Web_app.Models
 
     }
 
-    public partial class GetAssetDetailsFunction : GetAssetDetailsFunctionBase { } //this is Ethereum API - no need to check this module!!
+    internal partial class GetAssetDetailsFunction : GetAssetDetailsFunctionBase { } //this is Ethereum API - no need to check this module!!
 
     [Function("getAssetDetails", typeof(GetAssetDetailsOutputDTO))]
-    public class GetAssetDetailsFunctionBase : FunctionMessage
+    internal class GetAssetDetailsFunctionBase : FunctionMessage
     {
 
     }
 
 
-    public partial class GetAssetDetailsOutputDTO : GetAssetDetailsOutputDTOBase { }
+    internal partial class GetAssetDetailsOutputDTO : GetAssetDetailsOutputDTOBase { }
 
     [FunctionOutput]
-    public class GetAssetDetailsOutputDTOBase : IFunctionOutputDTO
+    internal class GetAssetDetailsOutputDTOBase : IFunctionOutputDTO
     {
         [Parameter("uint256", "AssetID", 1)]
         public virtual BigInteger AssetID { get; set; }

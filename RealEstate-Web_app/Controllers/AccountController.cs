@@ -195,13 +195,21 @@ namespace RealEstate_Web_app.Controllers
             DappAccount myWallet = new DappAccount(sellerAddress, sellerPrivateKey);
             if(myWallet.IsValidated)
             {
-                string myContractAddress = await SalesContract.Deploy(myWallet, 2, 1122, "Hadas 6 Haifa", 3, 110, "www.google.co.il", 1, buyerAddress);
+                //string myContractAddress = await SalesContract.Deploy(myWallet, 2, 1122, "Hadas 6 Haifa", 3, 110, "www.google.co.il", 1, buyerAddress);
+                string myContractAddress = "0x60c489f213ecf4f5B6b9fb5AA44d7566BdDfF6Df"; 
+                 
                 SalesContract newContract = new SalesContract(myWallet, myContractAddress);
-                //string checkJson = await newContract.getAssetDestails();
-                //newContract.getBuyerAddress();
+                string checkJson = await newContract.getAssetDestails();
+                string buyer = await newContract.getBuyerAddress();
                 //newContract.sendEtherToContract(1);
                 double c = await newContract.getBalance();
+                string owner = await newContract.getOldAssetOwner();
+                ulong timeLeft =  await newContract.getTimeLeftInSeconds();
+                string Thebuyer = await newContract.getBuyerAddress();
                 
+
+
+                int ii = 1;
             }
             
 
